@@ -1,0 +1,28 @@
+# libFuzzer dictionary for fuzz_dr_wav (dr_wav.h via drwav_init_memory).
+# RIFF/WAVE container chunk IDs dr_wav's chunk walk recognizes (src reader in dr_wav.h). Every
+# token is single-line (a literal newline inside a token aborts libFuzzer's dict parser before
+# the first input runs).
+
+riff="RIFF"
+riff64="RF64"
+wave="WAVE"
+w64_guid_prefix="\x72\x69\x66\x66"
+
+chunk_fmt="fmt "
+chunk_data="data"
+chunk_fact="fact"
+chunk_list="LIST"
+chunk_info="INFO"
+chunk_cue="cue "
+chunk_smpl="smpl"
+chunk_inst="inst"
+chunk_bext="bext"
+chunk_id3="id3 "
+chunk_ds64="ds64"
+
+# WAVE_FORMAT_* tags (fmt chunk, first 2 LE bytes).
+fmt_pcm="\x01\x00"
+fmt_ieee_float="\x03\x00"
+fmt_alaw="\x06\x00"
+fmt_mulaw="\x07\x00"
+fmt_extensible="\xfe\xff"

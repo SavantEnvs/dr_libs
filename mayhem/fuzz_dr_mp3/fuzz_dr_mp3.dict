@@ -1,0 +1,19 @@
+# libFuzzer dictionary for fuzz_dr_mp3 (dr_mp3.h via drmp3_init_memory).
+# MPEG frame sync words (11 bits set, varying MPEG version/layer bits) + tag/metadata magic dr_mp3
+# skips over while hunting for a frame sync. Every token is single-line (a literal newline inside
+# a token aborts libFuzzer's dict parser before the first input runs).
+
+sync_mpeg1_layer3="\xff\xfb"
+sync_mpeg1_layer3_crc="\xff\xfa"
+sync_mpeg2_layer3="\xff\xf3"
+sync_mpeg25_layer3="\xff\xe3"
+sync_mpeg1_layer2="\xff\xfd"
+sync_mpeg1_layer1="\xff\xff"
+
+id3v2="ID3"
+xing="Xing"
+info="Info"
+vbri="VBRI"
+lame_tag="LAME"
+
+apetag="APETAGEX"

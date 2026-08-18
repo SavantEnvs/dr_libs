@@ -1,0 +1,18 @@
+# New target: dr_wav.h decoder (RIFF/WAVE chunk walk + PCM/float/ALAW/MULAW extraction). dr_libs'
+# legacy integration only fuzzed FLAC; WAV is an independent untrusted-input parser over the same
+# single-header library.
+project: savantenvs/dr_libs
+target: fuzz_dr_wav
+# NOTE: the server-tar slug is hard-coded to savantenvs/dr-libs, NOT $MAYHEM_PROJECT.
+# mcode-action passes --project savantenvs/dr_libs (derived from the GitHub repo name), so
+# $MAYHEM_PROJECT expands to the UN-normalized "dr_libs" while Mayhem's real project slug is
+# "dr-libs" (it lowercases and maps _ -> -). Using $MAYHEM_PROJECT here yields "You do not have
+# access to use a test suite from the project dr_libs" and the run never starts.
+testsuite:
+  - https://$MAYHEM_DOMAIN/savantenvs/dr-libs/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/fuzz_dr_wav/testsuite
+
+cmds:
+  - cmd: /mayhem/fuzz_dr_wav
+    libfuzzer: true
+    dictionary: /mayhem/fuzz_dr_wav.dict
