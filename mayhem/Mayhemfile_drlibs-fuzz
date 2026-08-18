@@ -1,0 +1,18 @@
+# Historical Mayhem target (project dr-libs / target drlibs-fuzz, since 2022) -- keep the name
+# so run history/defects aren't orphaned. Upstream's own libFuzzer harness over dr_flac.h,
+# ported to the current dr_flac callback API (see mayhem/harnesses/fuzz_dr_flac.c).
+project: savantenvs/dr_libs
+target: drlibs-fuzz
+# NOTE: the server-tar slug is hard-coded to savantenvs/dr-libs, NOT $MAYHEM_PROJECT.
+# mcode-action passes --project savantenvs/dr_libs (derived from the GitHub repo name), so
+# $MAYHEM_PROJECT expands to the UN-normalized "dr_libs" while Mayhem's real project slug is
+# "dr-libs" (it lowercases and maps _ -> -). Using $MAYHEM_PROJECT here yields "You do not have
+# access to use a test suite from the project dr_libs" and the run never starts.
+testsuite:
+  - https://$MAYHEM_DOMAIN/savantenvs/dr-libs/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/drlibs-fuzz/testsuite
+
+cmds:
+  - cmd: /mayhem/fuzz_dr_flac
+    libfuzzer: true
+    dictionary: /mayhem/drlibs-fuzz.dict

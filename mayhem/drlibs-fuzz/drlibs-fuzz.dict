@@ -1,0 +1,24 @@
+# libFuzzer dictionary for drlibs-fuzz (dr_flac.h via drflac_open_relaxed).
+# FLAC native + Ogg-FLAC container magic and block-header tokens. Every token is single-line (a
+# literal newline inside a token aborts libFuzzer's dict parser before the first input runs).
+# NB: the harness's byte 0 selects native (odd) vs ogg (even) container, so these tokens land in
+# the stream starting at byte 1.
+
+magic_flac="fLaC"
+magic_ogg="OggS"
+
+# STREAMINFO / metadata block header: first bit = last-block flag, next 7 = block type (0..6).
+mdblock_streaminfo="\x00"
+mdblock_padding="\x01"
+mdblock_application="\x02"
+mdblock_seektable="\x03"
+mdblock_vorbis_comment="\x04"
+mdblock_cuesheet="\x05"
+mdblock_picture="\x06"
+mdblock_last_streaminfo="\x80"
+
+# Frame sync code (14 bits set) + common frame-header byte patterns.
+frame_sync="\xff\xf8"
+frame_sync_alt="\xff\xf9"
+
+vendor_string="reference libFLAC"
