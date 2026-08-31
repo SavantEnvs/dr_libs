@@ -3634,12 +3634,8 @@ DRWAV_PRIVATE drwav_bool32 drwav_init__internal(drwav* pWav, drwav_chunk_proc on
             fmt.formatTag      = compressionFormat;
             fmt.channels       = channels;
             fmt.sampleRate     = (drwav_uint32)sampleRate;
-            fmt.bitsPerSample  = sampleSizeInBits;
-
-            /* In AIFF, samples are padded to 8-bit boundaries. We need to round up our bits per sample here. */
-            fmt.bitsPerSample = (fmt.bitsPerSample + 7) & ~7;
-
-            fmt.blockAlign     = (drwav_uint16)(fmt.channels * fmt.bitsPerSample / 8);
+            fmt.bitsPerSample  = (sampleSizeInBits + 7) & ~7;   /* In AIFF, samples are padded to 8-bit boundaries. We need to round up our bits per sample here. */
+            fmt.blockAlign     = (drwav_uint16)((drwav_uint32)fmt.channels * fmt.bitsPerSample / 8);
             fmt.avgBytesPerSec = fmt.blockAlign * fmt.sampleRate;
 
             /*
