@@ -3642,10 +3642,6 @@ DRWAV_PRIVATE drwav_bool32 drwav_init__internal(drwav* pWav, drwav_chunk_proc on
             fmt.blockAlign     = (drwav_uint16)(fmt.channels * fmt.bitsPerSample / 8);
             fmt.avgBytesPerSec = fmt.blockAlign * fmt.sampleRate;
 
-            if (fmt.blockAlign == 0 && compressionFormat == DR_WAVE_FORMAT_DVI_ADPCM) {
-                fmt.blockAlign = 34 * fmt.channels;
-            }
-
             /*
             Weird one. I've seen some alaw and ulaw encoded files that for some reason set the bits per sample to 16 when
             it should be 8. To get this working I need to explicitly check for this and change it.
