@@ -1732,8 +1732,18 @@ static DRWAV_INLINE void drwav__bswap_samples(void* pSamples, drwav_uint64 sampl
         } break;
         default:
         {
-            /* Unsupported format. */
-            DRWAV_ASSERT(DRWAV_FALSE);
+            drwav_uint64 iSample;
+
+            for (iSample = 0; iSample < sampleCount; iSample += 1) {
+                drwav_uint8* pSample = (drwav_uint8*)pSamples + (iSample * bytesPerSample);
+                drwav_uint32 iByte;
+
+                for (iByte = 0; iByte < bytesPerSample / 2; iByte += 1) {
+                    drwav_uint8 temp = pSample[iByte];
+                    pSample[iByte] = pSample[bytesPerSample - iByte - 1];
+                    pSample[bytesPerSample - iByte - 1] = temp;
+                }
+            }
         } break;
     }
 }
@@ -3625,6 +3635,10 @@ DRWAV_PRIVATE drwav_bool32 drwav_init__internal(drwav* pWav, drwav_chunk_proc on
             fmt.channels       = channels;
             fmt.sampleRate     = (drwav_uint32)sampleRate;
             fmt.bitsPerSample  = sampleSizeInBits;
+
+            /* In AIFF, samples are padded to 8-bit boundaries. We need to round up our bits per sample here. */
+            fmt.bitsPerSample = (fmt.bitsPerSample + 7) & ~7;
+
             fmt.blockAlign     = (drwav_uint16)(fmt.channels * fmt.bitsPerSample / 8);
             fmt.avgBytesPerSec = fmt.blockAlign * fmt.sampleRate;
 
@@ -3642,10 +3656,6 @@ DRWAV_PRIVATE drwav_bool32 drwav_init__internal(drwav* pWav, drwav_chunk_proc on
                     fmt.blockAlign = fmt.channels;
                 }
             }
-
-            /* In AIFF, samples are padded to 8 byte boundaries. We need to round up our bits per sample here. */
-            fmt.bitsPerSample += (fmt.bitsPerSample & 7);
-
 
             /* If the form type is AIFC there will be some additional data in the chunk. We need to seek past it. */
             if (isAIFCFormType) {
