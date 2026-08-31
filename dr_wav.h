@@ -7192,31 +7192,35 @@ DRWAV_API void drwav_s32_to_s16(drwav_int16* pOut, const drwav_int32* pIn, size_
 
 DRWAV_API void drwav_f32_to_s16(drwav_int16* pOut, const float* pIn, size_t sampleCount)
 {
-    int r;
     size_t i;
     for (i = 0; i < sampleCount; ++i) {
         float x = pIn[i];
-        float c;
-        c = ((x < -1) ? -1 : ((x > 1) ? 1 : x));
-        c = c + 1;
-        r = (int)(c * 32767.5f);
-        r = r - 32768;
-        pOut[i] = (short)r;
+        if (x != x) {
+            pOut[i] = 0;    /* NaN */
+        } else if (x <= -1) {
+            pOut[i] = (-32767 - 1);
+        } else if (x >= 1) {
+            pOut[i] = 32767;
+        } else {
+            pOut[i] = (drwav_int16)(x * 32768.0f);
+        }
     }
 }
 
 DRWAV_API void drwav_f64_to_s16(drwav_int16* pOut, const double* pIn, size_t sampleCount)
 {
-    int r;
     size_t i;
     for (i = 0; i < sampleCount; ++i) {
         double x = pIn[i];
-        double c;
-        c = ((x < -1) ? -1 : ((x > 1) ? 1 : x));
-        c = c + 1;
-        r = (int)(c * 32767.5);
-        r = r - 32768;
-        pOut[i] = (short)r;
+        if (x != x) {
+            pOut[i] = 0;    /* NaN */
+        } else if (x <= -1) {
+            pOut[i] = (-32767 - 1);
+        } else if (x >= 1) {
+            pOut[i] = 32767;
+        } else {
+            pOut[i] = (drwav_int16)(x * 32768.0);
+        }
     }
 }
 
@@ -8139,26 +8143,34 @@ DRWAV_API void drwav_s24_to_s32(drwav_int32* pOut, const drwav_uint8* pIn, size_
 DRWAV_API void drwav_f32_to_s32(drwav_int32* pOut, const float* pIn, size_t sampleCount)
 {
     size_t i;
-
-    if (pOut == NULL || pIn == NULL) {
-        return;
-    }
-
     for (i = 0; i < sampleCount; ++i) {
-        *pOut++ = (drwav_int32)(2147483648.0f * pIn[i]);
+        float x = pIn[i];
+        if (x != x) {
+            pOut[i] = 0;    /* NaN */
+        } else if (x <= -1) {
+            pOut[i] = (-2147483647 - 1);
+        } else if (x >= 1) {
+            pOut[i] = 2147483647;
+        } else {
+            pOut[i] = (drwav_int32)(x * 2147483648.0f);
+        }
     }
 }
 
 DRWAV_API void drwav_f64_to_s32(drwav_int32* pOut, const double* pIn, size_t sampleCount)
 {
     size_t i;
-
-    if (pOut == NULL || pIn == NULL) {
-        return;
-    }
-
     for (i = 0; i < sampleCount; ++i) {
-        *pOut++ = (drwav_int32)(2147483648.0 * pIn[i]);
+        double x = pIn[i];
+        if (x != x) {
+            pOut[i] = 0;    /* NaN */
+        } else if (x <= -1) {
+            pOut[i] = (-2147483647 - 1);
+        } else if (x >= 1) {
+            pOut[i] = 2147483647;
+        } else {
+            pOut[i] = (drwav_int32)(x * 2147483648.0);
+        }
     }
 }
 
@@ -8690,6 +8702,8 @@ v0.14.6 - TBD
   - Fix an underflow error with badly formed W64 files.
   - Fix an error when converting from >32 bit samples to s16/f32/s32 on big-endian architectures.
   - Fix an error with conversion from u8, 16, alaw and mulaw to s32.
+  - Fix an error with AIFF files with an unusual bit depth.
+  - Fix some NaN conversion errors when converting from floating point to s16 and s32.
   - Add some bound checking when processing metadata chunks.
 
 v0.14.5 - 2026-03-03
